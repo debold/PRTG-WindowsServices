@@ -69,7 +69,7 @@ if ($UserName -eq "" -or $Password -eq "") {
 }
 
 # hardcoded list that applies to all hosts
-$IgnoreScript = '^(MapsBroker|sppsvc|RemoteRegistry|WbioSrvc|clr_optimization_.+)$'
+$IgnoreScript = '^(MapsBroker|sppsvc|RemoteRegistry|WbioSrvc|clr_optimization_.+|CDPSvc)$'
 $WmiQuery = "Select * from Win32_Service where StartMode='Auto' and State!='Running'"
 
 # Get list of services that are not running and set to automatic.
@@ -85,9 +85,9 @@ try {
 }
 
 # Remove all services from ignore lists
-$Services = $Services | Where-Object {$_.Name -notmatch $IgnoreScript}
+$Services = @($Services | Where-Object {$_.Name -notmatch $IgnoreScript})
 if ($IgnorePattern -ne "") {
-    $Services = $Services | Where-Object {$_.Name -notmatch $IgnorePattern}
+    $Services = @($Services | Where-Object {$_.Name -notmatch $IgnorePattern})
 }
 
 $Count = ($Services | Measure-Object).Count
@@ -97,7 +97,6 @@ if ($Count -gt 0) {
     for ($i = 1; $i -lt $Count; $i++) {
         $ServiceList += ", {0} ({1})" -f $Services[$i].DisplayName, $Services[$i].Name
     }
-    $ServiceList = ($Services | Select-Object -expand DisplayName) -join ", "
     Write-Host "$($Count):Automatic service(s) not running: $ServiceList"
     exit 1
 } else {
