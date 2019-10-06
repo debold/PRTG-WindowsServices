@@ -74,7 +74,7 @@ $WmiQuery = "Select * from Win32_Service where StartMode='Auto' and State!='Runn
 
 # Get list of services that are not running and set to automatic.
 try {
-    if ($null -ne $Credentials) {
+    if ($null -eq $Credentials) {
         $Services = Get-WmiObject -Query $WmiQuery -ComputerName $ComputerName  
     } else {
         $Services = Get-WmiObject -Query $WmiQuery -ComputerName $ComputerName -Credential $Credentials  
